@@ -5,26 +5,52 @@ using UnityEngine;
 
 public class Chunk : MonoBehaviour
 {
-    [SerializeField] Vector3 chunkPosition = Vector3.zero;
-    [SerializeField] int chunkSize = 3;
+    enum TestGrid { rows };
 
-    int[,,] grid =
-    {
-        {{0, 1, 0}, {1, 1, 1}, {0, 1, 0} },
-        {{1, 1, 1}, {1, 1, 1}, {1, 1, 1} },
-        {{0, 1, 0}, {1, 1, 1}, {0, 1, 0} }
-    };
+    [SerializeField] public Vector3 ChunkPosition = Vector3.zero;
+    [SerializeField] int chunkSize = 3;
+    [SerializeField] TestGrid testGrid;
+
+    int[,,] grid;
+    //int[,,] grid =
+    //{
+    //    {{0, 1, 0}, {1, 1, 1}, {0, 1, 0} },
+    //    {{1, 1, 1}, {1, 1, 1}, {1, 1, 1} },
+    //    {{0, 1, 0}, {1, 1, 1}, {0, 1, 0} }
+    //};
     MeshFilter meshFilter;
     Mesh mesh;
 
     private void Awake()
     {
-        transform.position = chunkPosition * chunkSize;
+        transform.position = ChunkPosition * chunkSize;
         meshFilter = GetComponent<MeshFilter>();
 
         mesh = new();
-        mesh.name = "Mesh: " + chunkPosition;
+        mesh.name = "Mesh: " + ChunkPosition;
         meshFilter.mesh = mesh;
+
+        SetTestGrid();
+    }
+
+    void SetTestGrid()
+    {
+        grid = new int[chunkSize, chunkSize, chunkSize];
+        switch (testGrid)
+        {
+            case TestGrid.rows:
+                for (int x = 0; x < chunkSize; x++)
+                {
+                    for (int y = 0; y < chunkSize; y++)
+                    {
+                        for (int z = 0; z < chunkSize; z++)
+                        {
+                            if (x%2 == 0 || y%8 == 0) grid[x, y, z] = 1;
+                        }
+                    }
+                }
+                break;
+        }
     }
 
     [Button]
@@ -102,4 +128,6 @@ public class Chunk : MonoBehaviour
         mesh.RecalculateBounds();
         mesh.RecalculateNormals();
     }
+
+
 }
