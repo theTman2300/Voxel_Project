@@ -5,25 +5,30 @@ using UnityEngine;
 
 public class Chunk : MonoBehaviour
 {
+    public class AdjecentChunks
+    {
+        public Chunk Front;
+        public Chunk Back;
+        public Chunk Left;
+        public Chunk Right;
+        public Chunk Bottom;
+        public Chunk Top;
+    }
+
     enum TestGrid { rows };
 
-    [SerializeField] public Vector3 ChunkPosition = Vector3.zero;
-    [SerializeField] int chunkSize = 3;
+    [SerializeField] public Vector3Int ChunkPosition = Vector3Int.zero;
     [SerializeField] TestGrid testGrid;
 
+    [HideInInspector] public int ChunkSize = 3;
     int[,,] grid;
-    //int[,,] grid =
-    //{
-    //    {{0, 1, 0}, {1, 1, 1}, {0, 1, 0} },
-    //    {{1, 1, 1}, {1, 1, 1}, {1, 1, 1} },
-    //    {{0, 1, 0}, {1, 1, 1}, {0, 1, 0} }
-    //};
+    AdjecentChunks adjecentChunks;
     MeshFilter meshFilter;
     Mesh mesh;
 
     private void Awake()
     {
-        transform.position = ChunkPosition * chunkSize;
+        transform.position = ChunkPosition * ChunkSize;
         meshFilter = GetComponent<MeshFilter>();
 
         mesh = new();
@@ -35,15 +40,15 @@ public class Chunk : MonoBehaviour
 
     void SetTestGrid()
     {
-        grid = new int[chunkSize, chunkSize, chunkSize];
+        grid = new int[ChunkSize, ChunkSize, ChunkSize];
         switch (testGrid)
         {
             case TestGrid.rows:
-                for (int x = 0; x < chunkSize; x++)
+                for (int x = 0; x < ChunkSize; x++)
                 {
-                    for (int y = 0; y < chunkSize; y++)
+                    for (int y = 0; y < ChunkSize; y++)
                     {
-                        for (int z = 0; z < chunkSize; z++)
+                        for (int z = 0; z < ChunkSize; z++)
                         {
                             if (x%2 == 0 || y%8 == 0) grid[x, y, z] = 1;
                         }
@@ -61,11 +66,11 @@ public class Chunk : MonoBehaviour
         int verticeCounter = 0;
         //int[] defaultFaceVertices = new int[] { verticeCounter, verticeCounter + 1, verticeCounter + 3, verticeCounter + 1, verticeCounter + 2, verticeCounter + 3 };
 
-        for (int x = 0; x < chunkSize; x++)
+        for (int x = 0; x < ChunkSize; x++)
         {
-            for (int y = 0; y < chunkSize; y++)
+            for (int y = 0; y < ChunkSize; y++)
             {
-                for (int z = 0; z < chunkSize; z++)
+                for (int z = 0; z < ChunkSize; z++)
                 {
                     if (grid[x, y, z] == 0) continue;
 
@@ -79,7 +84,7 @@ public class Chunk : MonoBehaviour
                     }
 
                     //back
-                    if (z == chunkSize - 1 || grid[x, y, z + 1] == 0) //check if face is not obscured
+                    if (z == ChunkSize - 1 || grid[x, y, z + 1] == 0) //check if face is not obscured
                     {
                         vertices.AddRange(new Vector3[] { new(x + 1, y, z + 1), new(x + 1, y + 1, z + 1), new(x, y + 1, z + 1), new(x, y, z + 1) });
                         triangles.AddRange(new int[] { verticeCounter, verticeCounter + 1, verticeCounter + 3, verticeCounter + 1, verticeCounter + 2, verticeCounter + 3 });
@@ -96,7 +101,7 @@ public class Chunk : MonoBehaviour
                     }
 
                     //right (Looking at the right side of the chunk)
-                    if (x == chunkSize - 1 || grid[x + 1, y, z] == 0) //check if face is not obscured
+                    if (x == ChunkSize - 1 || grid[x + 1, y, z] == 0) //check if face is not obscured
                     {
                         vertices.AddRange(new Vector3[] { new(x + 1, y, z), new(x + 1, y + 1, z), new(x + 1, y + 1, z + 1), new(x + 1, y, z + 1) });
                         triangles.AddRange(new int[] { verticeCounter, verticeCounter + 1, verticeCounter + 3, verticeCounter + 1, verticeCounter + 2, verticeCounter + 3 });
@@ -113,7 +118,7 @@ public class Chunk : MonoBehaviour
                     }
 
                     //top
-                    if (y == chunkSize - 1 || grid[x, y + 1, z] == 0) //check if face is not obscured
+                    if (y == ChunkSize - 1 || grid[x, y + 1, z] == 0) //check if face is not obscured
                     {
                         vertices.AddRange(new Vector3[] { new(x, y + 1, z), new(x, y + 1, z + 1), new(x + 1, y + 1, z + 1), new(x + 1, y + 1, z) });
                         triangles.AddRange(new int[] { verticeCounter, verticeCounter + 1, verticeCounter + 3, verticeCounter + 1, verticeCounter + 2, verticeCounter + 3 });
